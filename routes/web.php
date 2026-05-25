@@ -36,6 +36,6 @@ Route::get('/register-gym', function () {
         'message' => $setting->closed_message,
     ]);
 })->name('gym.register');
-Route::post('/register-gym', [RegistrationController::class, 'store']);
+Route::post('/register-gym', [RegistrationController::class, 'store'])->middleware('throttle:10,1');
 Route::get('/api/register-gym/slot-counts', [RegistrationController::class, 'getSlotCounts']);
 require __DIR__ . '/settings.php';

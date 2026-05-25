@@ -81,7 +81,7 @@ const TIMES = [
   "1:00 PM - 2:00 PM",
 ];
 
-const MAX_CAPACITY = 45;
+const MAX_CAPACITY = 40;
 const PIE_COLORS = ["#2563eb", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6"];
 
 /* ---------------------------------------------

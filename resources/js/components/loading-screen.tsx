@@ -15,12 +15,12 @@ export default function LoadingScreen() {
       setShow(false);
     };
 
-    router.on("start", start);
-    router.on("finish", finish);
+    const removeStart = router.on("start", start);
+    const removeFinish = router.on("finish", finish);
 
     return () => {
-      router.off("start", start);
-      router.off("finish", finish);
+      removeStart();
+      removeFinish();
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
