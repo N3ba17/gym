@@ -60,7 +60,7 @@ class RegistrationController extends Controller
         try {
             foreach ($validated['selectedSlots'] as $slot) {
                 $count = Registration::whereRaw(
-                    "EXISTS (SELECT 1 FROM json_each(selected_slots) WHERE json_extract(value, '$.day') = ? AND json_extract(value, '$.time') = ?)",
+                    "JSON_CONTAINS(selected_slots, JSON_OBJECT('day', ?, 'time', ?))",
                     [$slot['day'], $slot['time']]
                 )->count();
 
@@ -126,7 +126,7 @@ class RegistrationController extends Controller
         }
 
         $count = Registration::whereRaw(
-            "EXISTS (SELECT 1 FROM json_each(selected_slots) WHERE json_extract(value, '$.day') = ? AND json_extract(value, '$.time') = ?)",
+            "JSON_CONTAINS(selected_slots, JSON_OBJECT('day', ?, 'time', ?))",
             [$day, $time]
         )->count();
 
