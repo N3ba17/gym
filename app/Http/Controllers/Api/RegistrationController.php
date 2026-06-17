@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use App\Models\Registration;
 use App\Models\RegistrationSetting;
 use Inertia\Inertia;
@@ -14,21 +13,10 @@ class RegistrationController extends Controller
 {
     public function index()
     {
-        $slots = Registration::all()->flatMap(function ($reg) {
-            return collect($reg->selected_slots ?? [])->map(function ($slot) {
-                return [
-                    'day' => $slot['day'],
-                    'time' => $slot['time'],
-                ];
-            });
-        })->groupBy(fn($s) => $s['day'] . '||' . $s['time'])
-            ->map(fn($items) => $items->count())
-            ->toArray();
-
         $setting = RegistrationSetting::current();
 
         return Inertia::render('Registrations', [
-            'slotCounts' => $slots,
+            'slotCounts' => Registration::getSlotCounts(),
             'closeAt' => $setting->close_at?->toIso8601String(),
         ]);
     }
@@ -50,7 +38,8 @@ class RegistrationController extends Controller
             'sex' => 'required',
             'sector' => 'required',
             'phoneNumber' => 'required',
-            'selectedSlots' => 'required|array|min:1|max:3'
+            'chronicIllness' => 'nullable|string|max:1000',
+            'selectedSlots' => 'required|array|min:1|max:3',
         ]);
 
         $capacity = $setting->capacity ?? 40;
@@ -60,7 +49,7 @@ class RegistrationController extends Controller
         try {
             foreach ($validated['selectedSlots'] as $slot) {
                 $count = Registration::whereRaw(
-                    "JSON_CONTAINS(selected_slots, JSON_OBJECT('day', ?, 'time', ?))",
+                    "EXISTS (SELECT 1 FROM json_each(selected_slots) WHERE json_extract(value, '$.day') = ? AND json_extract(value, '$.time') = ?)",
                     [$slot['day'], $slot['time']]
                 )->count();
 
@@ -73,7 +62,7 @@ class RegistrationController extends Controller
                 }
             }
 
-            Registration::updateOrCreate(
+            $registration = Registration::updateOrCreate(
                 ['employee_id' => $validated['employeeId']],
                 [
                     'name' => $validated['name'],
@@ -81,7 +70,7 @@ class RegistrationController extends Controller
                     'sex' => $validated['sex'],
                     'sector' => $validated['sector'],
                     'phone_number' => $validated['phoneNumber'],
-                    'chronic_illness' => $request->chronicIllness,
+                    'chronic_illness' => $validated['chronicIllness'] ?? '',
                     'selected_slots' => $validated['selectedSlots'],
                 ]
             );
@@ -90,6 +79,7 @@ class RegistrationController extends Controller
 
             return back()->with([
                 'success' => 'Registration successful!',
+                'registration' => $registration->toArray(),
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -100,18 +90,7 @@ class RegistrationController extends Controller
 
     public function getSlotCounts()
     {
-        $slots = Registration::all()->flatMap(function ($reg) {
-            return collect($reg->selected_slots ?? [])->map(function ($slot) {
-                return [
-                    'day' => $slot['day'],
-                    'time' => $slot['time'],
-                ];
-            });
-        })->groupBy(fn($s) => $s['day'] . '||' . $s['time'])
-            ->map(fn($items) => $items->count())
-            ->toArray();
-
-        return response()->json($slots);
+        return response()->json(Registration::getSlotCounts());
     }
 
     public function checkCapacity(Request $request)
@@ -126,7 +105,7 @@ class RegistrationController extends Controller
         }
 
         $count = Registration::whereRaw(
-            "JSON_CONTAINS(selected_slots, JSON_OBJECT('day', ?, 'time', ?))",
+            "EXISTS (SELECT 1 FROM json_each(selected_slots) WHERE json_extract(value, '$.day') = ? AND json_extract(value, '$.time') = ?)",
             [$day, $time]
         )->count();
 

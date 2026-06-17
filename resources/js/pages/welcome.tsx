@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
-import { login, dashboard } from '@/routes';
 import { Dumbbell, Users, Calendar, TrendingUp, ArrowRight } from 'lucide-react';
+import { login, dashboard } from '@/routes';
 
 export default function Welcome() {
     return (

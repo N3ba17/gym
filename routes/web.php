@@ -29,10 +29,10 @@ Route::get('/register-gym', function () {
     $setting = \App\Models\RegistrationSetting::current();
 
     if ($setting->isRegistrationOpen()) {
-        return app(\App\Http\Controllers\Api\RegistrationController::class)->index();
+        return app(RegistrationController::class)->index();
     }
 
-    return \Inertia\Inertia::render('RegistrationClosed', [
+    return Inertia::render('RegistrationClosed', [
         'message' => $setting->closed_message,
     ]);
 })->name('gym.register');

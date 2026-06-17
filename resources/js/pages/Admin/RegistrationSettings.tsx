@@ -11,8 +11,8 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import RegistrationSettingController from "@/actions/App/Http/Controllers/Admin/RegistrationSettingController";
+import { cn } from "@/lib/utils";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -180,6 +180,7 @@ export default function RegistrationSettings({ setting }: Props) {
             <div className="flex flex-wrap gap-2">
               {DAYS.map((day) => {
                 const selected = openDays.includes(day);
+
                 return (
                   <button
                     key={day}
@@ -250,7 +251,9 @@ export default function RegistrationSettings({ setting }: Props) {
 
             {hasTimeLimit && (
               <button
-                onClick={() => { setOpenFrom(""); setOpenTo(""); }}
+                onClick={() => {
+ setOpenFrom(""); setOpenTo(""); 
+}}
                 className="mt-3 text-xs font-medium text-rose-500 hover:underline"
               >
                 Clear time range (allow all hours)

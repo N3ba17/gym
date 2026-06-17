@@ -7,11 +7,17 @@ export default function LoadingScreen() {
 
   useEffect(() => {
     const start = () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (timerRef.current) {
+clearTimeout(timerRef.current);
+}
+
       timerRef.current = setTimeout(() => setShow(true), 250);
     };
     const finish = () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (timerRef.current) {
+clearTimeout(timerRef.current);
+}
+
       setShow(false);
     };
 
@@ -21,11 +27,16 @@ export default function LoadingScreen() {
     return () => {
       removeStart();
       removeFinish();
-      if (timerRef.current) clearTimeout(timerRef.current);
+
+      if (timerRef.current) {
+clearTimeout(timerRef.current);
+}
     };
   }, []);
 
-  if (!show) return null;
+  if (!show) {
+return null;
+}
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm">

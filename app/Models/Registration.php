@@ -6,11 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Registration extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'name',
         'employee_id',
@@ -25,4 +20,13 @@ class Registration extends Model
     protected $casts = [
         'selected_slots' => 'array',
     ];
+
+    public static function getSlotCounts(): array
+    {
+        return self::all()
+            ->flatMap(fn($reg) => collect($reg->selected_slots ?? [])
+                ->map(fn($slot) => $slot['day'] . '||' . $slot['time']))
+            ->countBy()
+            ->toArray();
+    }
 }

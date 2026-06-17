@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { Dumbbell } from 'lucide-react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -9,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import { Dumbbell } from 'lucide-react';
 
 type Props = {
     status?: string;

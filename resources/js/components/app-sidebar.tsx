@@ -23,8 +23,8 @@ import {
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { dashboard, schedule } from '@/routes';
-import registrationsRoutes from '@/routes/registrations';
 import adminRoutes from '@/routes/admin';
+import registrationsRoutes from '@/routes/registrations';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [

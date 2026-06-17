@@ -49,6 +49,7 @@ type Props = {
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
+
   return d.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -58,6 +59,7 @@ function formatDate(dateStr: string) {
 
 function formatTime(dateStr: string) {
   const d = new Date(dateStr);
+
   return d.toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
@@ -184,7 +186,9 @@ export default function RegistrationsIndex({ registrations, filters }: Props) {
   const hasActiveFilters = sectorFilter || sexFilter || search;
 
   // Reset to page 1 when filters change
-  React.useEffect(() => { setPage(1); }, [search, sectorFilter, sexFilter]);
+  React.useEffect(() => {
+ setPage(1); 
+}, [search, sectorFilter, sexFilter]);
 
   const filtered = useMemo(() => {
     return registrations.filter((r) => {
