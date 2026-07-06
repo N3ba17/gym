@@ -42,6 +42,7 @@ const SECTORS = [
   "Construction Business Unit",
   "Integrated Technical Services Business Unit",
   "Plant & Logistics Management Business Unit",
+  "Corporate Service",
 ];
 
 const SCHEDULE_SLOTS = [

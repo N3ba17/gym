@@ -7,7 +7,7 @@ import {
   HeartPulse,
   Download,
 } from "lucide-react";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -166,6 +166,42 @@ function ChartShell({
   );
 }
 
+function MeasuredChart({ children, className = "h-72" }: { children: React.ReactNode; className?: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
+
+  const updateSize = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) {
+      setSize({ width: Math.round(rect.width), height: Math.round(rect.height) });
+    }
+  }, []);
+
+  useEffect(() => {
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [updateSize]);
+
+  if (!size) {
+    return <div ref={containerRef} className={className} />;
+  }
+
+  return (
+    <div ref={containerRef} className={className}>
+      {React.Children.map(children, child => {
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child as React.ReactElement<any>, { width: size.width, height: size.height });
+        }
+        return child;
+      })}
+    </div>
+  );
+}
+
 function KpiCard({
   label,
   value,
@@ -292,7 +328,7 @@ export default function Dashboard({ registrations, stats, charts }: Props) {
               </span>
             }
           >
-            <div className="h-72">
+            <MeasuredChart className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={charts?.trend ?? []} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
@@ -315,7 +351,7 @@ export default function Dashboard({ registrations, stats, charts }: Props) {
                   />
                 </AreaChart>
               </ResponsiveContainer>
-            </div>
+            </MeasuredChart>
           </ChartShell>
 
           <ChartShell
@@ -403,7 +439,7 @@ export default function Dashboard({ registrations, stats, charts }: Props) {
         ---------------------------------------------- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ChartShell title="Sex breakdown" subtitle="Distribution by sex">
-            <div className="h-72">
+            <MeasuredChart className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Tooltip content={<TooltipCard />} />
@@ -423,11 +459,11 @@ export default function Dashboard({ registrations, stats, charts }: Props) {
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
-            </div>
+            </MeasuredChart>
           </ChartShell>
 
           <ChartShell title="Age bands" subtitle="Registrations grouped into age ranges">
-            <div className="h-72">
+            <MeasuredChart className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={charts?.ageBands ?? []} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
@@ -448,7 +484,7 @@ export default function Dashboard({ registrations, stats, charts }: Props) {
                   />
                 </BarChart>
               </ResponsiveContainer>
-            </div>
+            </MeasuredChart>
           </ChartShell>
         </div>
 
@@ -460,7 +496,7 @@ export default function Dashboard({ registrations, stats, charts }: Props) {
             title="Sector distribution"
             subtitle="Registrations grouped by department/sector"
           >
-            <div className="h-80">
+            <MeasuredChart className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={charts?.sectors ?? []} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
@@ -489,7 +525,7 @@ export default function Dashboard({ registrations, stats, charts }: Props) {
                   />
                 </BarChart>
               </ResponsiveContainer>
-            </div>
+            </MeasuredChart>
           </ChartShell>
         </div>
 
